@@ -1,102 +1,77 @@
-const { buildDriver } = require('../../utils/driverFactory');
+const { buildDriver } = require('../utils/driverFactory');
+const ExcelHelper = require('../utils/ExcelHelper');
 const LoginPage = require('../pages/LoginPage');
-const ExcelHelper = require('../../utils/ExcelHelper');
 const { expect } = require('chai');
 
-describe('Automation Test - Chia sẻ Project', function () {
-    this.timeout(60000);
-    
-    let driver, loginPage, excelHelper;
-    // Biến này dùng để lưu dòng chữ lấy được từ Web
-    let testActualResult = ""; 
+// 1. Khai báo danh sách các Test Case ID bạn muốn chạy
+const testCaseIds = ['P1', 'P2'];
 
-    before(async function () {
-        excelHelper = new ExcelHelper();
-        await excelHelper.loadWorkbook();
+describe('Excel Keyword Driven Test', function () {
+    this.timeout(60000);
+
+    let driver, loginPage, excel;
+
+    before(async () => {
+        excel = new ExcelHelper();
+        await excel.loadWorkbook();
+
         driver = await buildDriver();
         loginPage = new LoginPage(driver);
     });
 
-    after(async function () {
-        await excelHelper.saveWorkbook();
-        if (driver) await driver.quit();
+    after(async () => {
+        await excel.saveWorkbook();
+        await driver.quit();
     });
 
-    // Reset biến chứa kết quả trước mỗi test case
-    beforeEach(function() {
-        testActualResult = "Chưa thực hiện / Lỗi script";
-    });
+    // 2. Dùng vòng lặp forEach để tạo ra từng `it` block cho mỗi Test Case
+    testCaseIds.forEach(testId => {
 
-    afterEach(async function () {
-        const testTitle = this.currentTest.title;
-        const idMatch = testTitle.match(/\[(.*?)\]/);
-        const testId = idMatch ? idMatch[1] : null;
+        it(`Run TestCase ${testId} from Excel`, async () => {
 
-        if (testId) {
-            const status = this.currentTest.state === 'passed' ? 'PASS' : 'FAIL';
-            
-            // Nếu Test Fail do lỗi code (VD: không tìm thấy element), ta ghi lỗi code
-            // Nếu Test chạy xong (dù sai logic), ta ghi dòng chữ lấy được từ màn hình (testActualResult)
-            
-            let finalNote = testActualResult;
-            
-            // Nếu có lỗi nghiêm trọng (crash), ghi đè bằng lỗi đó
-            if (this.currentTest.err && !testActualResult.includes("Hiển thị:")) {
-                 finalNote = "Script Error: " + this.currentTest.err.message;
+            // Lấy steps dựa trên testId hiện tại trong vòng lặp
+            const steps = excel.getStepsByTestId(testId);
+
+            let username = '';
+            let password = '';
+            const expected = excel.getExpected(testId);
+            let actual = '';
+            let isPass = false;
+
+            console.log(`\n🔹 STARTING TEST CASE: ${testId}`);
+
+            for (const s of steps) {
+                const step = String(s.step).toLowerCase();
+                console.log(`➡️ STEP: ${step} | DATA: ${s.data}`);
+
+                if (step.includes('mở trang')) {
+                    await driver.get(s.data);
+                }
+                else if (step.includes('nhập username')) {
+                    username = s.data;
+                }
+                else if (step.includes('nhập password')) {
+                    password = s.data;
+                }
+                else if (step.includes('click login')) {
+                    await loginPage.login(username, password);
+                }
+                else if (step.includes('chuyển đến trang')) {
+                    if (expected.trim() === 'Đăng nhập thành công') {
+                        actual = await driver.getCurrentUrl();
+                        isPass = actual.trim() === 'https://www.saucedemo.com/inventory.html';
+                    }
+                    else {
+                        actual = await loginPage.getErrorMessage();
+                        isPass = actual.trim() === expected.trim();
+                    }
+                }
             }
 
-            await excelHelper.writeTestResult(testId, status, finalNote);
-            console.log(`📝 [${testId}] Ghi vào Excel: "${finalNote}" -> ${status}`);
-        }
+            // Ghi kết quả vào Excel cho đúng ID đang chạy
+            excel.writeResult(testId, isPass, actual);
+
+            expect(isPass).to.equal(true);
+        });
     });
-
-    // --- HÀM TEST LOGIC ---
-    async function executeTest(testId) {
-        // 1. Đọc data
-        const data = excelHelper.getData(testId);
-        
-        if (!data.username && !data.password) {
-            testActualResult = "Thiếu Test Data trong Excel (username/password)";
-            throw new Error(testActualResult);
-        }
-
-        // 2. Thao tác Web
-        await loginPage.open('https://www.saucedemo.com/');
-        if (data.username) await loginPage.enterUsername(data.username);
-        if (data.password) await loginPage.enterPassword(data.password);
-        await loginPage.clickLogin();
-
-        // 3. LẤY THÔNG BÁO THỰC TẾ (QUAN TRỌNG)
-        // Đoạn này giúp bạn lấy text về DÙ PASS HAY FAIL
-        try {
-            const currentUrl = await driver.getCurrentUrl();
-            if (currentUrl.includes('inventory.html')) {
-                testActualResult = "Hiển thị: Đăng nhập thành công (Vào trang Inventory)";
-            } else {
-                const errorText = await loginPage.getErrorMessage();
-                testActualResult = `Hiển thị lỗi: ${errorText}`;
-            }
-        } catch (e) {
-            testActualResult = "Không lấy được thông báo lỗi trên màn hình";
-        }
-
-        // 4. So sánh (Assertion)
-        const expected = data.expected || '';
-        if (expected.includes('inventory.html')) {
-            const url = await driver.getCurrentUrl();
-            expect(url).to.include('inventory.html');
-        } else {
-            const errorMsg = await loginPage.getErrorMessage();
-            const cleanExpected = expected.replace('Hiển thị lỗi:', '').trim();
-            expect(errorMsg).to.include(cleanExpected);
-        }
-    }
-
-    // ============ TEST CASES (ID phải khớp Sheet "Chia sẻ project") ============
-    // Lưu ý: Nếu sheet Chia sẻ dự án dùng ID là S1, S2 thì bạn phải sửa tên test case lại thành [S1], [S2]
-
-    it('[S1] Test Case 1', async function () { await executeTest('S1'); });
-    it('[S2] Test Case 2', async function () { await executeTest('S2'); });
-    it('[S3] Test Case 3', async function () { await executeTest('S3'); });
-    it('[S4] Test Case 4', async function () { await executeTest('S4'); });
 });

@@ -1,7 +1,7 @@
-const { buildDriver } = require('../src/utils/driverFactory');
+const { buildDriver } = require('../../utils/driverFactory');
 const LoginPage = require('../src/pages/LoginPage');
 const CheckoutPage = require('../src/pages/CheckoutPage');
-const ExcelHelper = require('../src/utils/ExcelHelper');
+const ExcelHelper = require('../../utils/ExcelHelper');
 const { expect } = require('chai');
 
 describe('Automation Test - SauceDemo & Excel Report', function () {

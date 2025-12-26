@@ -6,7 +6,7 @@ class CSVReporter {
         // Tạo tên file với timestamp
         const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-');
         const csvPath = path.join(__dirname, '../test-reports', `test-report-${timestamp}.csv`);
-
+        
         this.csvWriter = createCsvWriter({
             path: csvPath,
             header: [
@@ -18,7 +18,7 @@ class CSVReporter {
                 { id: 'errorMessage', title: 'Error Message' }
             ]
         });
-
+        
         this.records = [];
         console.log(`\n📊 CSV Report sẽ được lưu tại: ${csvPath}\n`);
     }
