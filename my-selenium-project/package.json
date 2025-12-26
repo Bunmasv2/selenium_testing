@@ -1,0 +1,20 @@
+{
+  "name": "my-selenium-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha src/tests/main.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^6.2.2",
+    "chromedriver": "^143.0.3",
+    "csv-writer": "^1.6.0",
+    "exceljs": "^4.4.0",
+    "mocha": "^11.7.5",
+    "selenium-webdriver": "^4.39.0"
+  }
+}

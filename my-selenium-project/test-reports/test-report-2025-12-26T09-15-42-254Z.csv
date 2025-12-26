@@ -1,0 +1,20 @@
+Test Case,Description,Status,Duration (ms),Timestamp,Error Message
+TC01: Đăng nhập thành công với tài khoản standard_user,Demo Selenium Automation Project,PASSED,5028,2025-12-26T09:15:47.287Z,
+TC02: Đăng nhập với tài khoản problem_user (có bug UI),Demo Selenium Automation Project,PASSED,3787,2025-12-26T09:15:51.076Z,
+TC03: Đăng nhập thành công với tài khoản performance_glitch_user,Demo Selenium Automation Project,FAILED,3954,2025-12-26T09:15:55.033Z,expected 'https://www.saucedemo.com/' to include 'inventory.html'
+TC04: Đăng nhập thất bại với username không tồn tại,Demo Selenium Automation Project,PASSED,3935,2025-12-26T09:15:58.969Z,
+TC05: Đăng nhập thất bại với password sai,Demo Selenium Automation Project,PASSED,3871,2025-12-26T09:16:02.842Z,
+TC06: Đăng nhập thất bại với username rỗng,Demo Selenium Automation Project,PASSED,3771,2025-12-26T09:16:06.615Z,
+TC07: Đăng nhập thất bại với password rỗng,Demo Selenium Automation Project,PASSED,3802,2025-12-26T09:16:10.419Z,
+TC08: Đăng nhập thất bại với cả username và password rỗng,Demo Selenium Automation Project,PASSED,3799,2025-12-26T09:16:14.220Z,
+TC09: Đăng nhập thất bại với tài khoản bị locked,Demo Selenium Automation Project,PASSED,3883,2025-12-26T09:16:18.106Z,
+TC10: Checkout thành công với thông tin hợp lệ,Demo Selenium Automation Project,FAILED,16028,2025-12-26T09:16:34.137Z,"Waiting for element to be located By(css selector, *[id=""checkout""])
+Wait timed out after 10195ms"
+TC11: Checkout thành công với tên có ký tự đặc biệt,Demo Selenium Automation Project,FAILED,13797,2025-12-26T09:16:47.937Z,"Waiting for element to be located By(css selector, *[id=""add-to-cart-sauce-labs-backpack""])
+Wait timed out after 10060ms"
+TC12: Checkout thành công với postal code ngắn,Demo Selenium Automation Project,FAILED,15740,2025-12-26T09:17:03.678Z,"Waiting for element to be located By(css selector, *[id=""checkout""])
+Wait timed out after 10030ms"
+TC13: Checkout thất bại khi first name rỗng,Demo Selenium Automation Project,PASSED,13882,2025-12-26T09:17:17.561Z,
+TC14: Checkout thất bại khi last name rỗng,Demo Selenium Automation Project,PASSED,15789,2025-12-26T09:17:33.351Z,
+TC15: Checkout thất bại khi postal code rỗng,Demo Selenium Automation Project,PASSED,13823,2025-12-26T09:17:47.175Z,
+TC16: Checkout thất bại khi tất cả thông tin rỗng,Demo Selenium Automation Project,PASSED,13861,2025-12-26T09:18:01.038Z,
