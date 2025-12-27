@@ -18,7 +18,7 @@ class LoginPage extends BasePage {
     }
 
     async getErrorMessage() {
-                console.log('\n📘 Lấy thông báo lỗi đăng nhập nếu có',await this.getText(this.errorMessage) );
+        console.log('\n📘 Lấy thông báo lỗi đăng nhập nếu có',await this.getText(this.errorMessage) );
 
         return await this.getText(this.errorMessage);
     }
